@@ -66,9 +66,15 @@ dotenv.config();
 const PORT = Number(process.env.PORT ?? 4000);
 const MONGODB_URI = process.env.MONGODB_URI;
 const JWT_SECRET = process.env.JWT_SECRET;
+const IS_VERCEL = Boolean(process.env.VERCEL);
 
-if (!MONGODB_URI || !JWT_SECRET) {
-  throw new Error('MONGODB_URI and JWT_SECRET are required. Copy .env.example to .env and update values.');
+function requireEnv(): { mongodbUri: string; jwtSecret: string } {
+  if (!MONGODB_URI?.trim() || !JWT_SECRET?.trim()) {
+    throw new Error(
+      'MONGODB_URI and JWT_SECRET are required. Set them in Vercel Project Settings → Environment Variables.',
+    );
+  }
+  return { mongodbUri: MONGODB_URI.trim(), jwtSecret: JWT_SECRET.trim() };
 }
 
 const app = express();
@@ -88,11 +94,41 @@ app.use(
 );
 app.use(express.json({ limit: '1mb' }));
 
+let dbInitPromise: Promise<void> | null = null;
+
+async function ensureDatabaseReady(): Promise<void> {
+  const { mongodbUri } = requireEnv();
+  if (!dbInitPromise) {
+    dbInitPromise = (async () => {
+      await mongoose.connect(mongodbUri);
+      await seedDefaultRoles();
+      await migrateUserRoleKeys();
+    })();
+  }
+  await dbInitPromise;
+}
+
+if (IS_VERCEL) {
+  app.use(async (_req, res, next) => {
+    try {
+      await ensureDatabaseReady();
+      next();
+    } catch (err) {
+      console.error('Database init failed', err);
+      res.status(500).json({
+        message: err instanceof Error ? err.message : 'Database unavailable',
+      });
+    }
+  });
+}
+
 const UPLOADS_ROOT = path.resolve(process.cwd(), 'uploads');
 app.use('/uploads', express.static(UPLOADS_ROOT));
 
-const createToken = (userId: string) =>
-  jwt.sign({ sub: userId }, JWT_SECRET, { expiresIn: '7d' });
+const createToken = (userId: string) => {
+  const { jwtSecret } = requireEnv();
+  return jwt.sign({ sub: userId }, jwtSecret, { expiresIn: '7d' });
+};
 
 async function buildUserResponse(userId: string) {
   const user = await UserModel.findById(userId).lean();
@@ -944,9 +980,7 @@ app.put('/api/board', requireAuth, async (req, res) => {
 });
 
 const start = async () => {
-  await mongoose.connect(MONGODB_URI);
-  await seedDefaultRoles();
-  await migrateUserRoleKeys();
+  await ensureDatabaseReady();
   io.use((socket, next) => {
     const token = socket.handshake.auth?.token as string | undefined;
     if (!token) {
@@ -955,7 +989,8 @@ const start = async () => {
     }
 
     try {
-      const payload = jwt.verify(token, JWT_SECRET) as { sub?: string; userId?: string };
+      const { jwtSecret } = requireEnv();
+      const payload = jwt.verify(token, jwtSecret) as { sub?: string; userId?: string };
       const uid = payload.sub || payload.userId;
       if (!uid) {
         next(new Error('Unauthorized'));
@@ -979,8 +1014,12 @@ const start = async () => {
   });
 };
 
-start().catch((error) => {
-  // eslint-disable-next-line no-console
-  console.error('Failed to start server', error);
-  process.exit(1);
-});
+export default app;
+
+if (!IS_VERCEL) {
+  start().catch((error) => {
+    // eslint-disable-next-line no-console
+    console.error('Failed to start server', error);
+    process.exit(1);
+  });
+}
