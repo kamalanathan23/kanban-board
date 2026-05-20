@@ -1,0 +1,16 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import 'tailwindcss' source(none);
+@source './**/*.{js,ts,jsx,tsx}';
+@import 'tw-animate-css';
+@import './styles/globals.css';
+
+@layer base {
+  html,
+  body,
+  #root {
+    min-height: 100vh;
+    height: 100%;
+    margin: 0;
+    font-family: var(--font-sans);
+  }
+}
