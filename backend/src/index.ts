@@ -125,6 +125,19 @@ if (IS_VERCEL) {
 const UPLOADS_ROOT = path.resolve(process.cwd(), 'uploads');
 app.use('/uploads', express.static(UPLOADS_ROOT));
 
+// Vercel Services mount this app at routePrefix /api and forward paths without that prefix
+// (e.g. browser /api/health → Express sees /health). Restore /api so existing routes match.
+if (IS_VERCEL) {
+  app.use((req, _res, next) => {
+    const pathOnly = req.url.split('?')[0] ?? '';
+    if (pathOnly && !pathOnly.startsWith('/api')) {
+      const qs = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+      req.url = `/api${pathOnly}${qs}`;
+    }
+    next();
+  });
+}
+
 const createToken = (userId: string) => {
   const { jwtSecret } = requireEnv();
   return jwt.sign({ sub: userId }, jwtSecret, { expiresIn: '7d' });
