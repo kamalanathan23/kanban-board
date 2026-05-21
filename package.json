@@ -1,6 +1,0 @@
-{
-  "name": "kanban-board",
-  "private": true,
-  "version": "1.0.0",
-  "description": "Kanban Board monorepo (frontend + backend)"
-}
