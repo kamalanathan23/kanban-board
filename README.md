@@ -1,85 +1,128 @@
 # Kanban Board Application
 
-React + Vite frontend and Node/Express/MongoDB backend.
+Kanban Board Application is a full-stack, responsive web app for organizing work with drag-and-drop columns, task details, comments, attachments, real-time updates, and role-based admin tools—built with React, Vite, Tailwind CSS, Radix UI, Express, and MongoDB.
 
-## Local setup
+## Live Preview
 
-### Backend
+[View Live App](https://kanban-board-beryl-nine.vercel.app/)
+
+## Screenshots
+
+![Project board](https://raw.githubusercontent.com/kamalanathan23/kanban-board/refs/heads/main/frontend/src/assets/Project%20Board.png)
+
+![Login screen](https://raw.githubusercontent.com/kamalanathan23/kanban-board/refs/heads/main/frontend/src/assets/login%20image.png)
+
+## Tech Stack
+
+**Frontend**
+
+- React 18
+- Vite 6
+- Tailwind CSS 4
+- Radix UI
+- Redux Toolkit
+- React Router
+- Socket.IO Client
+- TypeScript tooling
+
+**Backend**
+
+- Node.js
+- Express 5
+- MongoDB / Mongoose
+- Socket.IO
+- JWT authentication
+- TypeScript
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 20+
+- npm
+- MongoDB (local or [MongoDB Atlas](https://www.mongodb.com/cloud/atlas))
+
+### Install
+
+**Backend**
 
 ```bash
 cd backend
-cp .env.example .env
-# Edit .env: set MONGODB_URI and a strong JWT_SECRET
 npm install
-npm run dev
 ```
 
-### Frontend
+Copy `backend/.env.example` to `backend/.env` and set:
+
+- `MONGODB_URI` — your MongoDB connection string
+- `JWT_SECRET` — a long random secret (at least 32 characters)
+
+Seed the default admin user:
+
+```bash
+npm run seed:admin
+```
+
+**Frontend**
 
 ```bash
 cd frontend
 npm install
+```
+
+### Run Locally
+
+Start the API (from `backend/`):
+
+```bash
 npm run dev
 ```
 
-Open http://localhost:3000 (API proxied to http://localhost:4000).
+The API runs on `http://localhost:4000`.
 
-## Environment variables (not in Git)
+Start the UI (from `frontend/`):
 
-| File | Purpose |
-|------|---------|
-| `backend/.env` | `MONGODB_URI`, `JWT_SECRET`, `PORT` — **keep local only** |
-| `frontend/.env` | Optional `VITE_API_BASE_URL` |
-
-Copy from `.env.example` files; never commit real `.env` files.
-
-## Publish to GitHub (first time)
-
-### 1. Create an empty repository on GitHub
-
-- Go to https://github.com/new
-- Name it (e.g. `kanban-board`)
-- **Do not** add README, .gitignore, or license (this project already has them)
-- Create the repository and copy the remote URL
-
-### 2. From the project root (PowerShell)
-
-```powershell
-cd "D:\AA\Kanban Board Application"
-
-# Confirm secrets are ignored (should list backend/.env)
-git check-ignore -v backend/.env
-
-# Stage and commit
-git add .
-git status
-# Verify: backend/.env, backend/uploads/, node_modules/ must NOT appear
-
-git commit -m "Initial commit: Kanban board app"
-
-# Link your GitHub repo (replace with your URL)
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO.git
-
-git branch -M main
-git push -u origin main
+```bash
+npm run dev
 ```
 
-### 3. If you use SSH instead of HTTPS
+The app runs on `http://localhost:3000`.
 
-```powershell
-git remote add origin git@github.com:YOUR_USERNAME/YOUR_REPO.git
-git push -u origin main
+Default admin login (after seed):
+
+| Field    | Value             |
+| -------- | ----------------- |
+| Email    | `admin@gmail.com` |
+| Password | `admin123`        |
+
+### Production Build
+
+**Frontend** (from `frontend/`):
+
+```bash
+npm run build
 ```
 
-## What must never be pushed
+Build artifacts are generated in the `frontend/dist/` folder.
 
-- `backend/.env` — database URL and JWT secret
-- `backend/uploads/` — user file attachments
-- Any file with passwords, API keys, or personal data
-- `node_modules/` (reinstall with `npm install`)
+**Backend** (from `backend/`):
 
-## Already committed a secret by mistake?
+```bash
+npm run build
+npm start
+```
 
-1. Remove from Git history (or rotate the secret immediately).
-2. Change `JWT_SECRET` and database password in production.
-3. Use [GitHub secret scanning](https://docs.github.com/en/code-security/secret-scanning) on public repos.
+Compiled output is generated in the `backend/dist/` folder.
+
+## Project Scripts
+
+**Frontend** (`frontend/`)
+
+- `npm run dev` — Start development server
+- `npm run build` — Create production build
+
+**Backend** (`backend/`)
+
+- `npm run dev` — Start API with hot reload
+- `npm run build` — Compile TypeScript
+- `npm start` — Run compiled API
+- `npm run seed:admin` — Create default admin user
