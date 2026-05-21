@@ -8,9 +8,9 @@ Kanban Board Application is a full-stack, responsive web app for organizing work
 
 ## Screenshots
 
-![Project board](https://raw.githubusercontent.com/kamalanathan23/kanban-board/refs/heads/main/frontend/src/assets/Project%20Board.png)
-
 ![Login screen](https://raw.githubusercontent.com/kamalanathan23/kanban-board/refs/heads/main/frontend/src/assets/login%20image.png)
+
+![Project board](https://raw.githubusercontent.com/kamalanathan23/kanban-board/refs/heads/main/frontend/src/assets/Project%20Board.png)
 
 ## Tech Stack
 
