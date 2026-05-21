@@ -4,7 +4,7 @@ Kanban Board Application is a full-stack, responsive web app for organizing work
 
 ## Live Preview
 
-[View Live App](https://kanban-board-beryl-nine.vercel.app/)
+[View Live App](https://kanban-admin-board.vercel.app/)
 
 ## Screenshots
 
